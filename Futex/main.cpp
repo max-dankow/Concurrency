@@ -23,7 +23,6 @@ public:
 
     void lock() {
         int desired = NO_OWNER;
-        // Ждем пока освободится.
         while (!owner.compare_exchange_strong(desired, (int) pthread_self())) {
             desired = NO_OWNER;
         }
@@ -44,29 +43,29 @@ private:
 const size_t THREAD_NUMBER = 4;
 const int MAX_GLOBAL = 100000000;
 
-void incrementer(mutex &mutex, size_t &count, int &value, int maxValue) {
+void incrementer(Futex &futex, size_t &count, int &value, int maxValue) {
     while (true) {
-        mutex.lock();
+        futex.lock();
         if (value < maxValue) {
             value++;
             ++count;
         } else {
-            mutex.unlock();
+            futex.unlock();
             break;
         }
-        mutex.unlock();
+        futex.unlock();
     }
 }
 
 size_t threadsCountToN(size_t threadNumber, int maxValue) {
     vector<std::thread> threads;
     vector<size_t> results(threadNumber);
-    mutex mutex;
+    Futex futex;
     int global = 0;
 
     for (size_t i = 0; i < threadNumber; ++i) {
         threads.push_back(
-                std::thread(incrementer, std::ref(mutex), std::ref(results[i]), std::ref(global), maxValue)
+                std::thread(incrementer, std::ref(futex), std::ref(results[i]), std::ref(global), maxValue)
         );
     }
 
@@ -76,7 +75,9 @@ size_t threadsCountToN(size_t threadNumber, int maxValue) {
     size_t operationCount = 0;
     for (size_t c : results) {
         operationCount += c;
+        cout << c << ' ';
     }
+    cout << std::endl;
     return operationCount;
 }
 
