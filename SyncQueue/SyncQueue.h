@@ -3,6 +3,7 @@
 
 #include <mutex>
 #include <condition_variable>
+#include "Optional.h"
 
 // push кладет до потери сознания
 // popOrWait (wait, если ничего нет)
@@ -20,11 +21,12 @@ class SyncQueue {
 public:
     typedef typename C::value_type ValueType;
 
-    // Помещает элемент в очередь в лябом случае.
+    // Помещает элемент в очередь в любом случае.
     void push(const ValueType &element);
 
     // Извлекает элемент их очереди, если она не пуста, в противном случае поток блокируется.
-    ValueType popOrWait();
+    ValueType& popOrWait();
+    Optional<typename C::value_type> popNoWait();
 
 private:
     C data;
@@ -38,17 +40,35 @@ void SyncQueue<C>::push(const typename C::value_type &element) {
     std::unique_lock<std::mutex> locker(mutex);
     data.push(element);
     isEmpty.notify_all();
+    // В деструкторе unique_lock делает unlock, если текущий поток владеет мьютексом.
 }
 
 template<class C>
-typename C::value_type SyncQueue<C>::popOrWait() {
+typename C::value_type& SyncQueue<C>::popOrWait() {
     std::unique_lock<std::mutex> locker(mutex);
+    // Ждем пока нет элементов в очереди.
     while (data.empty()) {
         isEmpty.wait(locker);
     }
     auto element = data.front();
     data.pop();
     return element;
+    // В деструкторе unique_lock делает unlock, если текущий поток владеет мьютексом.
+}
+
+
+template<class C>
+Optional<typename C::value_type> SyncQueue<C>::popNoWait() {
+    mutex.lock();
+    if (data.empty()) {
+        mutex.unlock();
+        return Optional<typename C::value_type>();  // Вернуть None.
+    } else {
+        auto element = data.front();
+        data.pop();
+        mutex.unlock();
+        return Optional<typename C::value_type>(element);  // Вернуть Some(element)
+    }
 }
 
 #endif //SYNCQUEUE_SYNCQUEUE_H
