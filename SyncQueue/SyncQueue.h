@@ -5,6 +5,7 @@
 #include <mutex>
 #include <condition_variable>
 #include "Optional.h"
+#include "Adapter.h"
 
 // push кладет до потери сознания
 // popOrWait (wait, если ничего нет)
@@ -15,7 +16,6 @@
 // еще одна SQproc, кладем ., если есть свободный тред и забираем, когда file_reader_thread что-то кидает в SQwork
 
 // вместо точек - указатели на матрицы (чтобы повторно юзать буфер, делать в proc erase без освобожд памяти)
-
 
 template<class C>
 class SyncQueue {
@@ -41,12 +41,11 @@ public:
     }
 
 private:
-    C data;
+    Adapter<C> data;
     std::mutex mutex;
     std::condition_variable isEmpty;
     bool closed;
 };
-
 
 template<class C>
 void SyncQueue<C>::push(const SyncQueue::ValueType &element) {
@@ -70,12 +69,11 @@ Optional<typename C::value_type> SyncQueue<C>::popOrWait() {
 
     // В этот момент не может быть открытой и одновременно пустой очереди.
     if (closed && data.empty()) {
-        return Optional<SyncQueue::ValueType > ();  // None
+        return Optional<SyncQueue::ValueType>();  // None
     }
 
-    auto element = data.front();
-    data.pop();
-    return Optional<SyncQueue::ValueType > (element);  // Some(element)
+    auto element = data.pop();
+    return Optional<SyncQueue::ValueType>(element);  // Some(element)
     // В деструкторе unique_lock делает unlock, если текущий поток владеет мьютексом.
 }
 
@@ -87,14 +85,13 @@ Optional<typename C::value_type> SyncQueue<C>::popNoWait() {
         mutex.unlock();
         return Optional<typename C::value_type>();  // Вернуть None
     } else {
-        auto element = data.front();
-        data.pop();
+        auto element = data.pop();
         mutex.unlock();
         return Optional<typename C::value_type>(element);  // Вернуть Some(element)
     }
 }
 
-template <class C>
+template<class C>
 void SyncQueue<C>::close() {
     std::unique_lock<std::mutex> locker(mutex);
     if (closed) {

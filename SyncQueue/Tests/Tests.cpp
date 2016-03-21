@@ -1,62 +1,61 @@
 #include <gtest/gtest.h>
+#include <algorithm>
 #include <queue>
 #include <stack>
 #include <list>
 #include <thread>
 #include "../SyncQueue.h"
-#include "../Detector.h"
-#include <algorithm>
 
-TEST(Detector, HaveMethods) {
-    // hasPush
-    ASSERT_TRUE(Detector<std::queue<Optional<int> > >::hasPush);
-    ASSERT_TRUE(Detector<std::stack<Optional<int> > >::hasPush);
-    ASSERT_FALSE(Detector<std::vector<Optional<int> > >::hasPush);
-    ASSERT_FALSE(Detector<std::list<Optional<int> > >::hasPush);
-    ASSERT_FALSE(Detector<std::deque<Optional<int> > >::hasPush);
-
-    // hasPop
-    ASSERT_TRUE(Detector<std::queue<Optional<int> > >::hasPop);
-    ASSERT_TRUE(Detector<std::stack<Optional<int> > >::hasPop);
-    ASSERT_FALSE(Detector<std::vector<Optional<int> > >::hasPop);
-    ASSERT_FALSE(Detector<std::list<Optional<int> > >::hasPop);
-    ASSERT_FALSE(Detector<std::deque<Optional<int> > >::hasPop);
-
-    // hasPushBack
-    ASSERT_FALSE(Detector<std::queue<Optional<int> > >::hasPushBack);
-    ASSERT_FALSE(Detector<std::stack<Optional<int> > >::hasPushBack);
-    ASSERT_TRUE(Detector<std::vector<Optional<int> > >::hasPushBack);
-    ASSERT_TRUE(Detector<std::deque<Optional<int> > >::hasPushBack);
-    ASSERT_TRUE(Detector<std::deque<Optional<int> > >::hasPushBack);
-
-    // hasPopBack
-    ASSERT_FALSE(Detector<std::queue<Optional<int> > >::hasPopBack);
-    ASSERT_FALSE(Detector<std::stack<Optional<int> > >::hasPopBack);
-    ASSERT_TRUE(Detector<std::vector<Optional<int> > >::hasPopBack);
-    ASSERT_TRUE(Detector<std::deque<Optional<int> > >::hasPopBack);
-    ASSERT_TRUE(Detector<std::deque<Optional<int> > >::hasPopBack);
-}
-
-TEST(Detector, Suitability) {
-    // push() and pop()
-    ASSERT_TRUE(Detector<std::queue<Optional<int> > >::pushPopSuitable);
-    ASSERT_TRUE(Detector<std::stack<Optional<int> > >::pushPopSuitable);
-    ASSERT_FALSE(Detector<std::vector<Optional<int> > >::pushPopSuitable);
-    ASSERT_FALSE(Detector<std::list<Optional<int> > >::pushPopSuitable);
-    ASSERT_FALSE(Detector<std::deque<Optional<int> > >::pushPopSuitable);
-
-    // push_back() and pop_back()
-    ASSERT_FALSE(Detector<std::queue<Optional<int> > >::pushBackPopBackSuitable);
-    ASSERT_FALSE(Detector<std::stack<Optional<int> > >::pushBackPopBackSuitable);
-    ASSERT_TRUE(Detector<std::vector<Optional<int> > >::pushBackPopBackSuitable);
-    ASSERT_TRUE(Detector<std::list<Optional<int> > >::pushBackPopBackSuitable);
-    ASSERT_TRUE(Detector<std::deque<Optional<int> > >::pushBackPopBackSuitable);
-}
-
-TEST(Detector, Unsuitability) {
-    ASSERT_FALSE(Detector<std::set<Optional<int> > >::pushPopSuitable);
-    ASSERT_FALSE(Detector<std::set<Optional<int> > >::pushBackPopBackSuitable);
-}
+//TEST(Detector, HaveMethods) {
+//    // hasPush
+//    ASSERT_TRUE(Detector<std::queue<Optional<int> > >::hasPush);
+//    ASSERT_TRUE(Detector<std::stack<Optional<int> > >::hasPush);
+//    ASSERT_FALSE(Detector<std::vector<Optional<int> > >::hasPush);
+//    ASSERT_FALSE(Detector<std::list<Optional<int> > >::hasPush);
+//    ASSERT_FALSE(Detector<std::deque<Optional<int> > >::hasPush);
+//
+//    // hasPop
+//    ASSERT_TRUE(Detector<std::queue<Optional<int> > >::hasPop);
+//    ASSERT_TRUE(Detector<std::stack<Optional<int> > >::hasPop);
+//    ASSERT_FALSE(Detector<std::vector<Optional<int> > >::hasPop);
+//    ASSERT_FALSE(Detector<std::list<Optional<int> > >::hasPop);
+//    ASSERT_FALSE(Detector<std::deque<Optional<int> > >::hasPop);
+//
+//    // hasPushBack
+//    ASSERT_FALSE(Detector<std::queue<Optional<int> > >::hasPushBack);
+//    ASSERT_FALSE(Detector<std::stack<Optional<int> > >::hasPushBack);
+//    ASSERT_TRUE(Detector<std::vector<Optional<int> > >::hasPushBack);
+//    ASSERT_TRUE(Detector<std::deque<Optional<int> > >::hasPushBack);
+//    ASSERT_TRUE(Detector<std::deque<Optional<int> > >::hasPushBack);
+//
+//    // hasPopBack
+//    ASSERT_FALSE(Detector<std::queue<Optional<int> > >::hasPopBack);
+//    ASSERT_FALSE(Detector<std::stack<Optional<int> > >::hasPopBack);
+//    ASSERT_TRUE(Detector<std::vector<Optional<int> > >::hasPopBack);
+//    ASSERT_TRUE(Detector<std::deque<Optional<int> > >::hasPopBack);
+//    ASSERT_TRUE(Detector<std::deque<Optional<int> > >::hasPopBack);
+//}
+//
+//TEST(Detector, Suitability) {
+//    // push() and pop()
+//    ASSERT_TRUE(Detector<std::queue<Optional<int> > >::pushPopSuitable);
+//    ASSERT_TRUE(Detector<std::stack<Optional<int> > >::pushPopSuitable);
+//    ASSERT_FALSE(Detector<std::vector<Optional<int> > >::pushPopSuitable);
+//    ASSERT_FALSE(Detector<std::list<Optional<int> > >::pushPopSuitable);
+//    ASSERT_FALSE(Detector<std::deque<Optional<int> > >::pushPopSuitable);
+//
+//    // push_back() and pop_back()
+//    ASSERT_FALSE(Detector<std::queue<Optional<int> > >::pushBackPopBackSuitable);
+//    ASSERT_FALSE(Detector<std::stack<Optional<int> > >::pushBackPopBackSuitable);
+//    ASSERT_TRUE(Detector<std::vector<Optional<int> > >::pushBackPopBackSuitable);
+//    ASSERT_TRUE(Detector<std::list<Optional<int> > >::pushBackPopBackSuitable);
+//    ASSERT_TRUE(Detector<std::deque<Optional<int> > >::pushBackPopBackSuitable);
+//}
+//
+//TEST(Detector, Unsuitability) {
+//    ASSERT_FALSE(Detector<std::set<Optional<int> > >::pushPopSuitable);
+//    ASSERT_FALSE(Detector<std::set<Optional<int> > >::pushBackPopBackSuitable);
+//}
 
 template<class C>
 void worker(std::vector<int> &values, SyncQueue<C> &taskQueue, std::mutex &mutex) {
@@ -119,7 +118,83 @@ bool master(size_t threadNumber) {
 
 TEST(SyncQueue, General) {
     ASSERT_TRUE(master<std::queue<size_t >>(2));
+    ASSERT_TRUE(master<std::deque<size_t >>(2));
+    ASSERT_TRUE(master<std::vector<size_t >>(2));
+    ASSERT_TRUE(master<std::list<size_t >>(2));
+    ASSERT_TRUE(master<std::stack<size_t >>(2));
 }
+
+TEST(SyncQueue, ClosedExceptons) {
+    SyncQueue<std::queue<int>> syncQueue;
+    syncQueue.close();
+    ASSERT_THROW(syncQueue.close(), std::logic_error);
+    ASSERT_THROW(syncQueue.push(0), std::logic_error);
+}
+
+
+//template<class ARRAY>
+//class Adapter {
+//public:
+//    template <class Type>
+//    void push(const Type &element);
+//
+//private:
+//    ARRAY data;
+//};
+//
+//template<class ARRAY>
+//template <class Type>
+//void Adapter<ARRAY>::push(const Type &element) { std::cout << "std";}
+//
+//template<>
+//template <class Type>
+//void Adapter<std::queue<Type>>::push(const Type &element) { }
+
+// WORKS[!!!]
+//template <typename ARRAY>
+//class Try{
+//public:
+//    typedef typename ARRAY::value_type ValueType;
+//    static void comment(const ValueType &element) {
+//        std::cout << "std\n";
+//    }
+//};
+//
+//template <>
+//template <typename T>
+//class Try<std::queue<T>> {
+//public:
+//    typedef T ValueType;
+//    static void comment(const ValueType &element) {
+//        std::cout << "special for queue\n";
+//    }
+//};
+
+
+// DOESN'T WORK[!!!!]
+//template <typename ARRAY>
+//class Try{
+//public:
+//    static void comment(const typename ARRAY::value_type &element);
+//};
+//
+//
+//template <typename ARRAY>
+//void Try<ARRAY>::comment(const typename ARRAY::value_type &element) {
+//    std::cout << "std\n";
+//}
+//
+//template<>
+//template <typename T>
+//void Try<std::queue<T>>::comment(const T &element) {
+//    std::cout << "partial spec for queue\n";
+//}
+
+//TEST(Try, General) {
+//    Try<std::queue<int>>::comment(3);
+//    Try<std::queue<char>>::comment('3');
+//    Try<std::list<char>>::comment('3');
+//}
 
 int main(int argc, char **argv) {
     testing::InitGoogleTest(&argc, argv);
