@@ -5,11 +5,11 @@ template<typename T>
 class Optional {
 public:
 
-    explicit Optional(T value) : valueExists(true), value(value) { }
+    explicit Optional(const T &value) : valueExists(true), value(value) { }
 
     explicit Optional() : valueExists(false) { }
 
-    bool some(T &result) {
+    bool some(T &result) const {
         if (valueExists) {
             result = value;
             return true;
@@ -17,7 +17,7 @@ public:
         return false;
     }
 
-    bool none() {
+    bool none() const {
         return !valueExists;
     }
 
