@@ -7,16 +7,6 @@
 #include "Optional.h"
 #include "Adapter.h"
 
-// push кладет до потери сознания
-// popOrWait (wait, если ничего нет)
-
-// file_reader_thread -> SQwork (порция) -> сколько-то тредов берут элементы и что-то делают (читаю матрицы, треды считают дет)
-// SQres (результаты) -> file_writer_thread (вывод на экран?)
-
-// еще одна SQproc, кладем ., если есть свободный тред и забираем, когда file_reader_thread что-то кидает в SQwork
-
-// вместо точек - указатели на матрицы (чтобы повторно юзать буфер, делать в proc erase без освобожд памяти)
-
 template<class C>
 class SyncQueue {
 public:
@@ -38,6 +28,10 @@ public:
 
     bool isClosed() const {
         return closed;
+    }
+
+    bool empty() const {
+        return data.empty();
     }
 
 private:
