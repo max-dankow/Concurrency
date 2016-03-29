@@ -77,7 +77,7 @@ TEST(SyncQueue, General) {
     ASSERT_TRUE(master<std::stack<int>>(2, 7));
 }
 
-TEST(SyncQueue, ClosedExceptons) {
+TEST(SyncQueue, ClosedExceptions) {
     SyncQueue<std::queue<int>> syncQueue;
     syncQueue.close();
     ASSERT_THROW(syncQueue.close(), std::logic_error);

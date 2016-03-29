@@ -1,6 +1,7 @@
 #ifndef SYNCQUEUE_OPTIONAL_H
 #define SYNCQUEUE_OPTIONAL_H
 
+// TODO: добавить поддержку перемещаемых объектов, сейчас Optional пребует copyable.
 template<typename T>
 class Optional {
 public:
