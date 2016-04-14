@@ -7,6 +7,11 @@
 #include "Optional.h"
 #include "Adapter.h"
 
+struct closedQueueException : std::exception {
+    const char *what() const noexcept {
+        return "Queue is closed";
+    }
+};
 // TODO: поправить поддержку перемещаемых объектов.
 template<class C>
 class SyncQueue {
@@ -47,8 +52,7 @@ template<class C>
 void SyncQueue<C>::push(const SyncQueue::ValueType &element) {
     std::unique_lock<std::mutex> locker(mutex);
     if (closed) {
-        // TODO: написать свой класс исключений для тренировки.
-        throw std::logic_error("Queue is closed");  // Деструктор locker вызовется и mutex раблокируется
+        throw closedQueueException();  // Деструктор locker вызовется и mutex раблокируется
     }
     data.push(element);
     // Если несколько потоков ждут по emptyCondition, то очередь пуста и добавление одного элемента
@@ -90,7 +94,7 @@ template<class C>
 void SyncQueue<C>::close() {
     std::unique_lock<std::mutex> locker(mutex);
     if (closed) {
-        throw std::logic_error("Queue is already closed");  // Деструктор locker вызовется и mutex раблокируется
+        throw closedQueueException();  // Деструктор locker вызовется и mutex раблокируется
     }
     closed = true;
     emptyCondition.notify_all();

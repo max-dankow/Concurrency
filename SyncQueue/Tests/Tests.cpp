@@ -80,8 +80,8 @@ TEST(SyncQueue, General) {
 TEST(SyncQueue, ClosedExceptions) {
     SyncQueue<std::queue<int>> syncQueue;
     syncQueue.close();
-    ASSERT_THROW(syncQueue.close(), std::logic_error);
-    ASSERT_THROW(syncQueue.push(0), std::logic_error);
+    ASSERT_THROW(syncQueue.close(), closedQueueException);
+    ASSERT_THROW(syncQueue.push(0), closedQueueException);
 }
 
 int main(int argc, char **argv) {
