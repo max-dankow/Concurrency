@@ -38,7 +38,7 @@ public:
 
         auto endTime = std::chrono::steady_clock::now();
         auto workTime = std::chrono::milliseconds(
-                std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime).count());
+                std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count());
         return workTime.count();
     }
 

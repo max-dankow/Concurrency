@@ -24,14 +24,24 @@ public:
     void lock() {
         int desired = NO_OWNER;
         int myThreadId = (int) pthread_self();
-        while (!owner.compare_exchange_strong(desired, myThreadId)) {
+        // Во первых, необходимо чтобы все что происходило в критической секции после lock стало видимо после unlock.
+        // Для этого необходимо использовать упорядочение освобождение-захват
+        // (упорядочение освобождение-поглощение по этой причине будет недостаточно).
+        // Во вторых, потоки, пытающиеся захватить futex, должны видеть захват(write), если какой-то поток решил, что он захватил
+        // и следовательно записал в owner себя. В противном случае, без упорядочения в этом месте несколько потоков могут начать
+        // исполнение критической секции. Поэтому необходимо не просто release, а release совмещенный с acquire.
+        // P.S. volatile дает acquire-release упорядоченность только в MS VS, так что не считается.
+        // P.S.S weak испольщуется потому, что на платформах, где weak может давать false, это позволит избавиться от вложенного цикла,
+        // а так как вычисление аргумента в данном случае не занимает значительного (вообще ни какого) времени, то ложные несрабатывания не повредят.
+
+        while (!owner.compare_exchange_weak(desired, myThreadId, std::memory_order_acq_rel)) {
             desired = NO_OWNER;
         }
     }
 
     void unlock() {
-        assert(owner.load(std::memory_order_relaxed) == (int) pthread_self());
-        owner.store(NO_OWNER);
+//        assert(owner.load(std::memory_order_relaxed) == (int) pthread_self());
+        owner.store(NO_OWNER, std::memory_order_acquire);
     }
 
 private:
@@ -105,12 +115,12 @@ void measureAverageTime(size_t threadNumber, size_t count) {
 int main() {
 
     measureSingleRun<Futex>(thread::hardware_concurrency() / 2, 400000000);
-    measureSingleRun<Futex>(thread::hardware_concurrency(), 400000000);
-    measureSingleRun<Futex>(thread::hardware_concurrency() * 2, 200000000);
+    measureSingleRun<Futex>(thread::hardware_concurrency(), 200000000);
+    measureSingleRun<Futex>(thread::hardware_concurrency() * 2, 100000000);
 
     measureSingleRun<std::mutex>(thread::hardware_concurrency() / 2, 400000000);
-    measureSingleRun<std::mutex>(thread::hardware_concurrency(), 400000000);
-    measureSingleRun<std::mutex>(thread::hardware_concurrency() * 2, 200000000);
+    measureSingleRun<std::mutex>(thread::hardware_concurrency(), 200000000);
+    measureSingleRun<std::mutex>(thread::hardware_concurrency() * 2, 100000000);
 
     return 0;
 }
