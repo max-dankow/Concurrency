@@ -7,4 +7,7 @@
 4* | 28.691 | 18.039
 8 | 53.792 | 20.773
 
-![Figure](/Futex/figure_1.png)
+![Figure1](/Futex/figure_1.png)
+
+'Relaxed' Futex - Futex с наименьшими возможными блокировками памяти
+![Figure2](/Futex/figure_2.png)
